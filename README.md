@@ -36,7 +36,7 @@ docker run -d --restart=on-failure:10 -p 8080:80 --network front-network --ip 10
 docker build -t database:01 -f Dockerfile.db .  
 ###### autoremove container  
 docker run -d -rm --restart=on-failure:10 -e POSTGRES_PASSWORD=django -e POSTGRES_USER=django -e POSTGRES_DB=django -e USERMAP_UID=999 -e USERMAP_GID=999 -d -v ./postgres:/var/lib/postgresql/data --network back-network --ip 10.10.251.3 --name database database:01  
-######or leave it intact after exit  
+###### or leave it intact after exit  
 docker run -d --restart=on-failure:10 -e POSTGRES_PASSWORD=django -e POSTGRES_USER=django -e POSTGRES_DB=django -e USERMAP_UID=999 -e USERMAP_GID=999 -d -v ./postgres:/var/lib/postgresql/data --network back-network --ip 10.10.251.3 --name database database:01  
 ## Backend.  
 docker build -t backend:01 -f Dockerfile.back .  
