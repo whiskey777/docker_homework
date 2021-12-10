@@ -22,35 +22,28 @@
 1. Completed. Container created. Images used: node:lts-alpine and nginx:alpine. Multistage build. Final size 25,35mb
 2. Completed. Containers created. Images used: python:3.8-alpine and postgres:14-alpine. Connected to back-network. Data loaded and shown in API
     Test link http://localhost:8000/api/v1/lib/bbk/
-3. Completed. docker-compose run - working fine. Frontend connected to front-network. Backend and database connected to back-network.
+3. Completed. docker-compose build ***or run*** - working fine. Frontend connected to front-network. Backend and database connected to back-network.
     Test link http://localhost:8080/bbks
 
 ## Preparing networks
 
-docker network create --driver bridge --subnet 10.10.250.0/24 --ip-range 10.10.250.0/24 front-network
-docker network create --driver bridge --subnet 10.10.251.0/24 --ip-range 10.10.251.0/24 back-network
-
-## Frontend
-
-docker build -t frontend:01 -f Dockerfile.front .
-docker run -d --restart=on-failure:10 -p 8080:80 --network front-network --ip 10.10.250.2 --name frontend frontend:01
-
-## database. 
-
-docker build -t database:01 -f Dockerfile.db .
-# autoremove container
-docker run -d -rm --restart=on-failure:10 -e POSTGRES_PASSWORD=django -e POSTGRES_USER=django -e POSTGRES_DB=django -e USERMAP_UID=999 -e USERMAP_GID=999 -d -v ./postgres:/var/lib/postgresql/data --network back-network --ip 10.10.251.3 --name database database:01
-# or leave it intact after exit
-docker run -d --restart=on-failure:10 -e POSTGRES_PASSWORD=django -e POSTGRES_USER=django -e POSTGRES_DB=django -e USERMAP_UID=999 -e USERMAP_GID=999 -d -v ./postgres:/var/lib/postgresql/data --network back-network --ip 10.10.251.3 --name database database:01
-
-## backend.
-
-docker build -t backend:01 -f Dockerfile.back .
+docker network create --driver bridge --subnet 10.10.250.0/24 --ip-range 10.10.250.0/24 front-network  
+docker network create --driver bridge --subnet 10.10.251.0/24 --ip-range 10.10.251.0/24 back-network  
+## Frontend  
+docker build -t frontend:01 -f Dockerfile.front .  
+docker run -d --restart=on-failure:10 -p 8080:80 --network front-network --ip 10.10.250.2 --name frontend frontend:01  
+## Database.  
+docker build -t database:01 -f Dockerfile.db .  
+###### autoremove container  
+docker run -d -rm --restart=on-failure:10 -e POSTGRES_PASSWORD=django -e POSTGRES_USER=django -e POSTGRES_DB=django -e USERMAP_UID=999 -e USERMAP_GID=999 -d -v ./postgres:/var/lib/postgresql/data --network back-network --ip 10.10.251.3 --name database database:01  
+######or leave it intact after exit  
+docker run -d --restart=on-failure:10 -e POSTGRES_PASSWORD=django -e POSTGRES_USER=django -e POSTGRES_DB=django -e USERMAP_UID=999 -e USERMAP_GID=999 -d -v ./postgres:/var/lib/postgresql/data --network back-network --ip 10.10.251.3 --name database database:01  
+## Backend.  
+docker build -t backend:01 -f Dockerfile.back .  
 docker run -d -p 8000:8000 --restart=on-failure:10 --name backend --network back-network --ip 10.10.251.2 backend:01
 
-## Docker compose
-
-# build'n'run
-docker-compose run
-# delete all traces os user images (postgres image will be intact)
+## Docker compose  
+###### build'n'run
+docker-compose run  
+###### delete all traces os user images (postgres image will be intact)  
 docker-compose down & docker image rm docker_homework_backend & docker image rm docker_homework_frontend
