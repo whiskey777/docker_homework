@@ -17,7 +17,7 @@
 
 4.* Осуществить сборку проекта самим docker-compose команда docker-compose build(при использовании этого подхода необходимо исключить 2 пункт из критерии оценки)
 
-## added by AVK
+## added by whiskey777
 
 1. Completed. Container created. Images used: node:lts-alpine and nginx:alpine. Multistage build. Final size 25,35mb
 2. Completed. Containers created. Images used: python:3.8-alpine and postgres:14-alpine. Connected to back-network. Data loaded and shown in API
