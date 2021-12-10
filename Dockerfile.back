@@ -1,0 +1,25 @@
+FROM python:3.8-alpine
+ENV PYTHONUNBUFFERED=1
+
+WORKDIR /app
+
+HEALTHCHECK --interval=60s --timeout=5s --retries=3 CMD ["wget","-nv","-t1","--spider","http://localhost:8000/admin"]
+
+COPY lib_catalog/requirements.txt .
+RUN \
+  apk add --no-cache libxml2 libxslt libxml2-dev libxslt-dev postgresql-libs && \
+  apk add --no-cache --virtual .build-deps gcc musl-dev postgresql-dev && \
+  pip install -r requirements.txt --no-cache-dir && \
+  apk --purge del .build-deps
+
+COPY lib_catalog .
+COPY check-postgres.py .
+
+RUN \
+  sed -i 's/ALLOWED_HOSTS = \[\]/ALLOWED_HOSTS = \[\"\*\"\]/g' lib_catalog/settings.py && \
+  echo >> lib_catalog/settings.py && \
+  echo CORS_ORIGIN_ALLOW_ALL = True >> lib_catalog/settings.py
+
+CMD python check-postgres.py &&\
+  python manage.py loaddata bbk_data &&\
+  python manage.py runserver 0.0.0.0:8000

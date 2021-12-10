@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.front
+    restart: unless-stopped
+    ports:
+      - 8080:80
+    stdin_open: true
+    networks:
+      - front-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.back
+    restart: unless-stopped
+    ports:
+      - 8000:8000
+    networks:
+      - back-network
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: django
+      POSTGRES_PASSWORD: django
+      POSTGRES_DB: django
+    restart: unless-stopped
+    healthcheck:
+      test: /usr/local/bin/pg_isready --username=django || exit 1
+      interval: 30s
+      timeout: 5s
+      retries: 5
+    networks:
+      - back-network
+    volumes:
+       - ./postgres:/var/lib/postgresql/data
+
+networks:
+  back-network:
+  front-network:
+
+volumes:
+  postgres:
